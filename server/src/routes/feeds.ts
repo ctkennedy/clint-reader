@@ -10,13 +10,12 @@ feedsRouter.get("/", async (_req, res) => {
     orderBy: { title: "asc" },
   });
 
-  const rows = await prisma.$queryRawUnsafe<{ feedId: string; count: number }[]>(
-    `SELECT i.feedId as feedId, COUNT(*) as count
-     FROM Item i JOIN ItemState s ON s.itemId = i.id
-     WHERE s.isRead = 0
-     GROUP BY i.feedId`
-  );
-  const countMap = new Map(rows.map((r) => [r.feedId, Number(r.count)]));
+  const rows = await prisma.item.groupBy({
+    by: ["feedId"],
+    where: { state: { isRead: false } },
+    _count: { _all: true },
+  });
+  const countMap = new Map(rows.map((r) => [r.feedId, r._count._all]));
 
   res.json(
     feeds.map((f) => ({
