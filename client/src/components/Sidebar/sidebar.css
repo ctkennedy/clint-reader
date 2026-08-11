@@ -148,9 +148,43 @@
   color: var(--text-muted);
 }
 
+.feed-row {
+  display: flex;
+  align-items: center;
+}
+
 .feed-row .feed-link {
+  width: auto;
+  flex: 1;
+  min-width: 0;
   padding-left: 36px;
   justify-content: space-between;
+}
+
+.row-action-btn {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--text-muted);
+  border-radius: 0;
+}
+.row-action-btn:hover {
+  color: var(--danger);
+  background: var(--bg-hover);
+}
+
+.rename-folder-form {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 10px 3px 0;
+}
+.rename-folder-form input {
+  width: 100%;
+  font-size: 13px;
+  padding: 3px 6px;
 }
 
 .feed-title {

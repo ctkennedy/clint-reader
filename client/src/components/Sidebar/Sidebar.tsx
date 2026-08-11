@@ -20,6 +20,8 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
   const [dragFeedId, setDragFeedId] = useState<string | null>(null);
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState("");
 
   const feeds = feedsQuery.data || [];
   const folders = foldersQuery.data || [];
@@ -39,6 +41,32 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
       queryClient.invalidateQueries({ queryKey: ["folders"] });
       setNewFolderName("");
       setNewFolderOpen(false);
+    },
+  });
+
+  const renameFolderMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => api.renameFolder(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      setEditingFolderId(null);
+    },
+  });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: (id: string) => api.deleteFolder(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      if (activeScope === `folder:${id}`) navigate("/?stream=all");
+    },
+  });
+
+  const unsubscribeMutation = useMutation({
+    mutationFn: (id: string) => api.unsubscribe(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      if (activeScope === `feed:${id}`) navigate("/?stream=all");
     },
   });
 
@@ -64,6 +92,36 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  }
+
+  function startRenameFolder(folder: Folder) {
+    setEditingFolderId(folder.id);
+    setEditingFolderName(folder.name);
+  }
+
+  function submitRenameFolder(folderId: string) {
+    const name = editingFolderName.trim();
+    if (!name) {
+      setEditingFolderId(null);
+      return;
+    }
+    renameFolderMutation.mutate({ id: folderId, name });
+  }
+
+  function handleDeleteFolder(folder: Folder) {
+    const feedCount = feedsInFolder(folder.id).length;
+    const message =
+      feedCount > 0
+        ? `Delete "${folder.name}"? Its ${feedCount} feed${feedCount === 1 ? "" : "s"} will move to "Not in a folder" — they won't be unsubscribed.`
+        : `Delete the empty folder "${folder.name}"?`;
+    if (window.confirm(message)) deleteFolderMutation.mutate(folder.id);
+  }
+
+  function handleUnsubscribe(feed: Feed) {
+    const name = feed.customTitle || feed.title;
+    if (window.confirm(`Unsubscribe from "${name}"? This deletes all of its saved items and can't be undone.`)) {
+      unsubscribeMutation.mutate(feed.id);
+    }
   }
 
   function handleDrop(folderId: string) {
@@ -93,6 +151,16 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
           {feed.faviconUrl ? <img className="favicon" src={feed.faviconUrl} alt="" /> : <span className="favicon-placeholder" />}
           <span className="feed-title">{feed.customTitle || feed.title}</span>
           {feed.unreadCount ? <span className="unread-badge">{formatUnread(feed.unreadCount)}</span> : null}
+        </button>
+        <button
+          className="row-action-btn"
+          title="Unsubscribe"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnsubscribe(feed);
+          }}
+        >
+          ✕
         </button>
       </li>
     );
@@ -158,6 +226,7 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
           const collapsed = collapsedFolders.has(folder.id);
           const unread = folderUnread(folder.id);
           const scope = `folder:${folder.id}`;
+          const isEditing = editingFolderId === folder.id;
           return (
             <li
               key={folder.id}
@@ -169,10 +238,52 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
                 <button className="collapse-toggle" onClick={() => toggleFolder(folder.id)}>
                   {collapsed ? "▸" : "▾"}
                 </button>
-                <button className="folder-link" onClick={() => onSelectScope(scope)}>
-                  <span className="folder-name">{folder.name}</span>
-                  {unread ? <span className="unread-badge">{formatUnread(unread)}</span> : null}
-                </button>
+                {isEditing ? (
+                  <form
+                    className="rename-folder-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      submitRenameFolder(folder.id);
+                    }}
+                  >
+                    <input
+                      autoFocus
+                      value={editingFolderName}
+                      onChange={(e) => setEditingFolderName(e.target.value)}
+                      onBlur={() => submitRenameFolder(folder.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") setEditingFolderId(null);
+                      }}
+                    />
+                  </form>
+                ) : (
+                  <>
+                    <button className="folder-link" onClick={() => onSelectScope(scope)}>
+                      <span className="folder-name">{folder.name}</span>
+                      {unread ? <span className="unread-badge">{formatUnread(unread)}</span> : null}
+                    </button>
+                    <button
+                      className="row-action-btn"
+                      title="Rename folder"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startRenameFolder(folder);
+                      }}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      className="row-action-btn"
+                      title="Delete folder"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteFolder(folder);
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </>
+                )}
               </div>
               {!collapsed && <ul className="feed-list">{feedsInFolder(folder.id).map(renderFeedRow)}</ul>}
             </li>
