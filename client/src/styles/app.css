@@ -106,6 +106,13 @@ select {
   min-width: 0;
 }
 
+.reader-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .empty-hint {
   color: var(--text-muted);
   padding: 12px;
