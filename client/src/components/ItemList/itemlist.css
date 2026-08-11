@@ -1,0 +1,135 @@
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.item-list-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.item-row {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.item-row.unread {
+  background: var(--unread-bg);
+}
+
+.item-row.selected {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.item-row-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.star-btn {
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  font-size: 15px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.star-btn.active {
+  color: var(--accent);
+  background: none;
+  border: none;
+}
+
+.feed-name {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.item-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.item-row.unread .item-title {
+  font-weight: 700;
+}
+
+.item-title:hover {
+  text-decoration: underline;
+}
+
+.item-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.item-summary {
+  margin: 4px 0 0 30px;
+  font-size: 13px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-row.expanded .item-title,
+.item-row .item-body {
+  white-space: normal;
+}
+
+.item-body {
+  margin-top: 10px;
+  margin-left: 30px;
+}
+
+.article-content {
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 720px;
+}
+.article-content img,
+.article-content video {
+  max-width: 100%;
+  height: auto;
+}
+.article-content p {
+  margin: 0 0 1em;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.item-actions .open-original {
+  align-self: center;
+  font-size: 13px;
+}
+
+.load-sentinel {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+}

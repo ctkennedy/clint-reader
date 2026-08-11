@@ -1,0 +1,17 @@
+.help-modal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.help-modal td {
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.help-modal td.key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 600;
+  color: var(--accent-dark);
+  width: 40%;
+  white-space: nowrap;
+}

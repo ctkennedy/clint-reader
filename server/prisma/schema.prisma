@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Folder {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  feeds     FeedFolder[]
+}
+
+model Feed {
+  id           String       @id @default(cuid())
+  url          String       @unique
+  siteUrl      String?
+  title        String
+  customTitle  String?
+  faviconUrl   String?
+  description  String?
+  createdAt    DateTime     @default(now())
+  lastFetchedAt DateTime?
+  lastError    String?
+  folders      FeedFolder[]
+  items        Item[]
+}
+
+model FeedFolder {
+  feedId   String
+  folderId String
+  feed     Feed   @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@id([feedId, folderId])
+}
+
+model Item {
+  id          String     @id @default(cuid())
+  feedId      String
+  guid        String
+  url         String?
+  title       String
+  author      String?
+  contentHtml String?
+  summary     String?
+  publishedAt DateTime
+  fetchedAt   DateTime   @default(now())
+  feed        Feed       @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  state       ItemState?
+
+  @@unique([feedId, guid])
+  @@index([publishedAt])
+}
+
+model ItemState {
+  itemId    String   @id
+  isRead    Boolean  @default(false)
+  isStarred Boolean  @default(false)
+  isShared  Boolean  @default(false)
+  isLiked   Boolean  @default(false)
+  readAt    DateTime?
+  updatedAt DateTime @updatedAt
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([isRead])
+  @@index([isStarred])
+  @@index([isShared])
+}
+
+model Setting {
+  key   String @id
+  value String
+}

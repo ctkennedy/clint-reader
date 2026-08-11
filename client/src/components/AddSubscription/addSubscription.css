@@ -1,0 +1,4 @@
+/* Modal chrome lives in styles/app.css (.modal, .modal-backdrop). Form-specific tweaks only. */
+.modal select:disabled {
+  opacity: 0.5;
+}

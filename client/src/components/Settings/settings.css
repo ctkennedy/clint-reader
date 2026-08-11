@@ -1,0 +1,48 @@
+.settings-page {
+  padding: 24px 32px;
+  overflow-y: auto;
+  max-width: 640px;
+}
+
+.settings-header h1 {
+  margin: 6px 0 20px;
+}
+
+.settings-page section {
+  margin-bottom: 28px;
+}
+
+.settings-page h2 {
+  font-size: 15px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.settings-row select {
+  min-width: 200px;
+}
+
+.settings-hint {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.import-export-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.import-result {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--accent-dark);
+}
