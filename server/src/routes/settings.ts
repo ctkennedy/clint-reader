@@ -9,6 +9,7 @@ const DEFAULTS: Record<string, string> = {
   sortOrder: "newest", // "newest" | "oldest"
   itemsPerPage: "40",
   theme: "light",
+  openLinksIn: "newTab", // "newTab" | "readingPane"
 };
 
 settingsRouter.get("/", async (_req, res) => {

@@ -58,6 +58,7 @@ export interface Settings {
   sortOrder: "newest" | "oldest";
   itemsPerPage: string;
   theme: string;
+  openLinksIn: "newTab" | "readingPane";
 }
 
 export interface Trends {

@@ -7,13 +7,14 @@ import { TrendsPage } from "./components/Trends/TrendsPage";
 import { SettingsPage } from "./components/Settings/SettingsPage";
 import { AddSubscriptionModal } from "./components/AddSubscription/AddSubscriptionModal";
 import { HelpOverlay } from "./components/KeyboardShortcuts/HelpOverlay";
+import { LinkPane } from "./components/ReadingPane/LinkPane";
 import { useGlobalShortcuts } from "./components/KeyboardShortcuts/useKeyboardShortcuts";
 
 function AppShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { sidebarCollapsed, toggleSidebar, helpOpen, setHelpOpen } = useReaderUI();
+  const { sidebarCollapsed, toggleSidebar, helpOpen, setHelpOpen, linkPaneTarget, closeLinkPane } = useReaderUI();
   const [modalOpen, setModalOpen] = useState(false);
 
   const activeScope = location.pathname === "/" ? searchParams.get("stream") || "all" : "";
@@ -34,6 +35,7 @@ function AppShell() {
     onEscape: () => {
       setModalOpen(false);
       setHelpOpen(false);
+      closeLinkPane();
     },
   });
 
@@ -55,6 +57,9 @@ function AppShell() {
         />
       )}
       {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
+      {linkPaneTarget && (
+        <LinkPane url={linkPaneTarget.url} title={linkPaneTarget.title} onClose={closeLinkPane} />
+      )}
     </div>
   );
 }

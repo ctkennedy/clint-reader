@@ -1,5 +1,6 @@
 import DOMPurify from "dompurify";
 import { useMemo } from "react";
+import { useLinkOpener } from "../../state/useLinkOpener";
 
 DOMPurify.addHook("afterSanitizeAttributes", (node) => {
   if (node.tagName === "A") {
@@ -9,6 +10,8 @@ DOMPurify.addHook("afterSanitizeAttributes", (node) => {
 });
 
 export function ArticleContent({ html }: { html: string }) {
+  const { handleLinkClick } = useLinkOpener();
+
   const clean = useMemo(
     () =>
       DOMPurify.sanitize(html, {
@@ -19,5 +22,15 @@ export function ArticleContent({ html }: { html: string }) {
     [html]
   );
 
-  return <div className="article-content" dangerouslySetInnerHTML={{ __html: clean }} />;
+  // Links are injected via dangerouslySetInnerHTML, so a plain React onClick can't
+  // attach to them individually — delegate from the wrapping div instead.
+  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
+    const anchor = (e.target as HTMLElement).closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href) return;
+    handleLinkClick(e, href, anchor.textContent || undefined);
+  }
+
+  return <div className="article-content" onClick={handleClick} dangerouslySetInnerHTML={{ __html: clean }} />;
 }

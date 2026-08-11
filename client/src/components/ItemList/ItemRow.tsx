@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Item } from "../../api/types";
 import { ArticleContent } from "../ReadingPane/ArticleContent";
+import { useLinkOpener } from "../../state/useLinkOpener";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -38,6 +39,7 @@ export function ItemRow({
   onToggleLike,
 }: Props) {
   const ref = useRef<HTMLLIElement>(null);
+  const { handleLinkClick } = useLinkOpener();
   const isRead = item.state?.isRead ?? false;
   const isStarred = item.state?.isStarred ?? false;
   const isShared = item.state?.isShared ?? false;
@@ -117,7 +119,13 @@ export function ItemRow({
               {isLiked ? "👍 Liked" : "👍 Like"}
             </button>
             {item.url && (
-              <a href={item.url} target="_blank" rel="noopener noreferrer" className="open-original">
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="open-original"
+                onClick={(e) => handleLinkClick(e, item.url!, item.title)}
+              >
                 View original ↗
               </a>
             )}

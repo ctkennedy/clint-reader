@@ -78,6 +78,17 @@ export function SettingsPage() {
         </label>
 
         <label className="settings-row">
+          <span>Open links in</span>
+          <select
+            value={settings.openLinksIn}
+            onChange={(e) => updateSettings({ openLinksIn: e.target.value as "newTab" | "readingPane" })}
+          >
+            <option value="newTab">New browser tab</option>
+            <option value="readingPane">Reading pane (in-app)</option>
+          </select>
+        </label>
+
+        <label className="settings-row">
           <span>Items per page</span>
           <select value={settings.itemsPerPage} onChange={(e) => updateSettings({ itemsPerPage: e.target.value })}>
             <option value="20">20</option>
