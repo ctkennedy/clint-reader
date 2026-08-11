@@ -7,6 +7,7 @@ import { opmlRouter } from "./routes/opml.js";
 import { searchRouter } from "./routes/search.js";
 import { statsRouter } from "./routes/stats.js";
 import { settingsRouter } from "./routes/settings.js";
+import { embedRouter } from "./routes/embed.js";
 
 export const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/opml", opmlRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/settings", settingsRouter);
+app.use("/api/embed", embedRouter);
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 

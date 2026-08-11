@@ -67,4 +67,7 @@ export const api = {
   // OPML
   exportOpmlUrl: () => `${BASE}/opml/export`,
   importOpml: (xml: string) => request<{ imported: number; failed: number }>("/opml/import", { method: "POST", body: JSON.stringify({ xml }) }),
+
+  // Embedding
+  checkEmbeddable: (url: string) => request<{ embeddable: boolean; checkFailed?: boolean }>(`/embed/check?url=${encodeURIComponent(url)}`),
 };
