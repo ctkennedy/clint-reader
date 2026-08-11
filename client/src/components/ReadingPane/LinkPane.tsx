@@ -57,7 +57,7 @@ export function LinkPane({ url, title, onClose }: { url: string; title?: string;
             <span className="link-pane-url">{url}</span>
           </div>
           <div className="link-pane-actions">
-            <a href={url} target="_blank" rel="noopener noreferrer" className="button-link">
+            <a href={url} target="_blank" rel="noopener noreferrer" className="button-link" onClick={onClose}>
               Open in new tab ↗
             </a>
             <button onClick={onClose} title="Close (Esc)">
@@ -76,7 +76,13 @@ export function LinkPane({ url, title, onClose }: { url: string; title?: string;
                 It's blocking embedding for security reasons (most news and social sites do this) — that's a
                 setting on their end a reading pane can't get around.
               </p>
-              <a href={url} target="_blank" rel="noopener noreferrer" className="button-link link-pane-blocked-cta">
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-link link-pane-blocked-cta"
+                onClick={onClose}
+              >
                 Open in new tab ↗
               </a>
             </div>
