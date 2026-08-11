@@ -131,6 +131,23 @@
   padding: 0;
 }
 
+.folder-node.unfiled {
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+.unfiled-row {
+  padding: 4px 14px;
+}
+
+.unfiled-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
 .feed-row .feed-link {
   padding-left: 36px;
   justify-content: space-between;

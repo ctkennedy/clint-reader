@@ -190,6 +190,9 @@ export function Sidebar({ activeScope, onSelectScope }: { activeScope: string; o
               setDragFeedId(null);
             }}
           >
+            <div className="folder-row unfiled-row">
+              <span className="unfiled-label">Not in a folder</span>
+            </div>
             <ul className="feed-list">{unfiledFeeds.map(renderFeedRow)}</ul>
           </li>
         )}
