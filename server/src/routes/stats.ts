@@ -17,27 +17,31 @@ statsRouter.get("/trends", async (_req, res) => {
     where: { isRead: true, readAt: { gte: thirtyDaysAgo } },
   });
 
-  const feedActivity = await prisma.$queryRawUnsafe<{ feedId: string; title: string; readCount: number }[]>(
-    `SELECT f.id as feedId, COALESCE(f.customTitle, f.title) as title, COUNT(*) as readCount
-     FROM ItemState s
-     JOIN Item i ON i.id = s.itemId
-     JOIN Feed f ON f.id = i.feedId
-     WHERE s.isRead = 1
-     GROUP BY f.id
-     ORDER BY readCount DESC
-     LIMIT 10`
-  );
+  const groupedActivity = await prisma.item.groupBy({
+    by: ["feedId"],
+    where: { state: { isRead: true } },
+    _count: true,
+    orderBy: { _count: { feedId: "desc" } },
+    take: 10,
+  });
+  const activeFeeds = await prisma.feed.findMany({
+    where: { id: { in: groupedActivity.map((g) => g.feedId) } },
+    select: { id: true, title: true, customTitle: true },
+  });
+  const titleById = new Map(activeFeeds.map((f) => [f.id, f.customTitle || f.title]));
+  const feedActivity = groupedActivity.map((g) => ({
+    feedId: g.feedId,
+    title: titleById.get(g.feedId) || "Unknown feed",
+    readCount: g._count,
+  }));
 
-  // Prisma stores SQLite DateTime columns as integer Unix-ms, not ISO text,
-  // so raw SQL needs date(readAt / 1000, 'unixepoch') and an integer bound.
-  const dailyRows = await prisma.$queryRawUnsafe<{ day: string; count: number }[]>(
-    `SELECT date(readAt / 1000, 'unixepoch') as day, COUNT(*) as count
-     FROM ItemState
-     WHERE isRead = 1 AND readAt IS NOT NULL AND readAt >= ?
-     GROUP BY day
-     ORDER BY day ASC`,
-    thirtyDaysAgo.getTime()
-  );
+  const dailyRows = await prisma.$queryRaw<{ day: string; count: bigint }[]>`
+    SELECT to_char(date_trunc('day', "readAt"), 'YYYY-MM-DD') as day, COUNT(*) as count
+    FROM "ItemState"
+    WHERE "isRead" = true AND "readAt" IS NOT NULL AND "readAt" >= ${thirtyDaysAgo}
+    GROUP BY day
+    ORDER BY day ASC
+  `;
 
   res.json({
     subscriptionCount,
@@ -47,7 +51,7 @@ statsRouter.get("/trends", async (_req, res) => {
     totalShared,
     readLast30,
     unreadNow: totalItems - totalRead,
-    mostActiveFeeds: feedActivity.map((r) => ({ ...r, readCount: Number(r.readCount) })),
+    mostActiveFeeds: feedActivity,
     dailyReadCounts: dailyRows.map((r) => ({ day: r.day, count: Number(r.count) })),
   });
 });

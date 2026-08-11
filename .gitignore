@@ -8,3 +8,4 @@ server/prisma/dev.db-journal
 .DS_Store
 *.tsbuildinfo
 .claude/settings.local.json
+.netlify/
